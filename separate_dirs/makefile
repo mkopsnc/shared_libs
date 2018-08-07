@@ -1,5 +1,8 @@
 .PHONY: clean
 
+CC=icc
+#CC=gcc
+
 assert = $(if $2,$(if $1,,$(error $2)))
 location = $(CURDIR)/$(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))
 
@@ -19,21 +22,21 @@ src/shared.c: check
 
 obj/shared.o: src/shared.c
 	@echo Compiling library code with version $(MAJOR).$(MINOR)
-	gcc -fPIC -c -o obj/shared.o src/shared.c
+	$(CC) -fPIC -c -o obj/shared.o src/shared.c
 
 lib: obj/shared.o
 	@echo Building library with version $(MAJOR).$(MINOR)
 	@mkdir -p $(LIBDIR)/lib
-	gcc -shared -fpic obj/shared.o -o $(LIBDIR)/lib/libshared.so
+	$(CC) -shared -fpic obj/shared.o -o $(LIBDIR)/lib/libshared.so
 
 bin/exe_lib_ldpath_$(MAJOR)_$(MINOR): src/caller.c
-	gcc -o $@ $< -Iinclude -L$(LIBDIR)/lib -lshared
+	$(CC) -o $@ $< -Iinclude -L$(LIBDIR)/lib -lshared
 
 bin/exe_file_ldpath_$(MAJOR)_$(MINOR): src/caller.c
-	gcc -o $@ $< -Iinclude $(LIBDIR)/lib/libshared.so
+	$(CC) -o $@ $< -Iinclude $(LIBDIR)/lib/libshared.so
 
 bin/exe_file_ldpath_rpath_$(MAJOR)_$(MINOR): src/caller.c
-	gcc -o $@ $< -Iinclude -lshared -L$(LIBDIR)/lib -Wl,-rpath,$(CURDIR)/$(LIBDIR)/lib
+	$(CC) -o $@ $< -Iinclude -lshared -L$(LIBDIR)/lib -Wl,-rpath,$(CURDIR)/$(LIBDIR)/lib
 
 clean:
 	-rm src/shared.c
