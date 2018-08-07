@@ -1,0 +1,9 @@
+#include <stdio.h>
+#include "sharedA.h"
+
+char *version = "@VERSION@";
+
+void shared_code() {
+  printf("This is my version: %s\n", version);
+  shared_code_A();
+}
